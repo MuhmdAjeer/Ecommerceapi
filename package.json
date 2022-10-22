@@ -1,0 +1,32 @@
+{
+  "name": "ecommerce-api",
+  "version": "1.0.0",
+  "description": "Ecommerce API ",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "Ecommerce API"
+  },
+  "author": "Muhammed Ajeer",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "helmet": "^6.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.6.6",
+    "morgan": "^1.10.0",
+    "twilio": "^3.83.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
