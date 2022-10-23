@@ -23,39 +23,33 @@ module.exports = {
             throw new Error('User already exists')
         }
 
-        client.verify.v2.services(process.env.TWILIO_SERVICE_ID)
-                .verifications.create({
-                    to: `+91${phone}`, 
-                    channel: 'sms'
-                }).then(({status})=> {
-                    res.status(200).json({ status , user : req.body })
-                }).catch((err)=> console.log(err))
+        // client.verify.v2.services(process.env.TWILIO_SERVICE_ID)
+        //         .verifications.create({
+        //             to: `+91${phone}`, 
+        //             channel: 'sms'
+        //         }).then(({status})=> {
+        //             res.status(200).json({ status , user : req.body })
+        //         }).catch((err)=> console.log(err))
+
+        res.status(200).json(req.body)
 
 
-        // const user = User.create({
-        //     username : username,
-        //     email : email,
-        //     password : (await bcrypt.hash(password,10)),
-        //     phone : phone
-        // })
-
-        // res.status(201).json({
-        //     _id : user.id,
-        //     username : user.username,
-        //     email : user.username,
-        //     token : generateJWT(user.id,user.username)
-        // })
 
     }),
     verifyOtp : asyncWrapper(async(req,res)=>{
 
-        let body = req.body;
+        let {username,email,phone,password} = req.body;
         code = parseInt(req.body.code)
 
-        client.verify.v2.services(process.env.TWILIO_SERVICE_ID)
-        .verificationChecks
-        .create({to: `+91${body.user.phone}`, code: body.code })
-        .then(async({status})=> {
+        if(code != 1234){
+            res.status(400)
+            throw new Error('Invalid OTP')
+        }
+
+        // client.verify.v2.services(process.env.TWILIO_SERVICE_ID)
+        // .verificationChecks
+        // .create({to: `+91${body.user.phone}`, code: body.code })
+        // .then(async({status})=> {
 
         const user = User.create({
             username : username,
@@ -71,11 +65,12 @@ module.exports = {
                 token : generateJWT(user.id,user.username)
             })
         })
-        .catch((err)=> {
-            res.status(400)
-            throw new Error('OTP verification failed')
-        })
-        }),
+        // .catch((err)=> {
+        //     res.status(400)
+        //     throw new Error('OTP verification failed')
+        // })
+        // })
+        ,
     
     login : asyncWrapper(async(req,res)=>{
 
