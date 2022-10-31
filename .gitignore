@@ -1,2 +1,5 @@
+# package dependencies
 node_modules/
-.env/
+
+# .env files
+.env
