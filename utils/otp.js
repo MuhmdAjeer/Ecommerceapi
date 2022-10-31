@@ -44,7 +44,7 @@ module.exports = {
     if (!otpRecord) {
       return false;
     }
-    if (otp != otpRecord.otp) {
+    if (otp != otpRecord.otp[0]) {
       return false;
     }
     OTP.deleteMany({ email })

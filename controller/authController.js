@@ -39,12 +39,7 @@ module.exports = {
 
         let { username, email, phone, password } = req.body.user;
         let code = parseInt(req.body.code)
-
-        if (code != 1234) {
-            res.status(400)
-            throw new Error('Invalid OTP')
-        }
-
+        
         try {
             const verified = await verifyOtp(email, code)
 
