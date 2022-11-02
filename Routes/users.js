@@ -1,12 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const { register, verifyAndRegister, login, resetPassword, forgetPassword } = require('../controller/userAuth')
+const { register, verifyAndRegister, login, resetPassword, forgetPassword, verifyOTP } = require('../controller/userAuth')
 
 
 // Authentication
-router.post('/login', login)
-router.post('/register', register)
-router.post('/verify', verifyAndRegister)
+router.post('/login', login);
+router.post('/register', register);
+router.post('/verify', verifyAndRegister);
+router.post('/verifyOtp',verifyOTP);
 
 //Forogot password
 router.route('/accounts/password')

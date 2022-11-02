@@ -40,14 +40,21 @@ module.exports = {
   },
 
   verifyOtp: async (email, otp) => {
-    const otpRecord = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
-    if (!otpRecord) {
+
+    let otpRecord = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
+    
+    const record = otpRecord[0] || otpRecord;
+    console.log(record);
+    
+    if (!record) {
+      console.log('dfs');
       return false;
     }
-    if (otp != otpRecord.otp[0]) {
+    if (otp == record.otp) {
+      await OTP.deleteMany({ email })
+      return true;
+    }else{
       return false;
     }
-    OTP.deleteMany({ email })
-    return true;
   }
 }

@@ -107,21 +107,21 @@ module.exports = {
             throw new Error(error)
         }
     },
-    verifyOTP: async (req, res) => {
+    verifyOTP: asyncWrapper(async (req, res) => {
         const { email, otp } = req.body;
         try {
             const verified = await verifyOtp(email, otp);
             if (!verified) {
                 res.status(400)
-                throw new Error('OTP verifcation failed!')
+                throw new Error('Invalid OTP!')
             }
-            res.status(200).json({
-                status: ok, message: "OTP verification success"
+            return res.status(200).json({
+                status: 'ok', message: "OTP verification success"
             })
         } catch (error) {
             throw new Error(error)
         }
-    },
+    }),
     forgetPassword: async (req, res) => {
         const { email } = req.body;
         try {
@@ -145,17 +145,16 @@ module.exports = {
         }
     },
     resetPassword: async (req, res, next) => {
-        const { email, password, otp } = req.body;
+        const { email, password } = req.body;
         try {
-            const verified = await verifyOtp(email, otp);
-            console.log(verified);
-            if (!verified) {
-                return res.status(401).json({
-                    message:"Invalid OTP"
+            const user = await User.findOne({ email })
+            if (!user) {
+                return res.status(404).json({
+                    message: "No users found with this email address"
                 })
             }
             const hashedPassword = await bcrypt.hash(password,10);
-            const user = User.updateOne({email},{password : hashedPassword})
+            await User.findOneAndUpdate({email},{password : hashedPassword})
             return res.status(200).json({
                 message:"Password updates succesfully"
             })
