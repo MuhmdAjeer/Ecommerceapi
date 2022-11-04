@@ -15,6 +15,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.1",
+    "cloudinary": "^1.32.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -24,6 +25,7 @@
     "helmet": "^6.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.6.6",
+    "mongoose-sequence": "^5.3.1",
     "morgan": "^1.10.0",
     "nodemailer": "^6.8.0",
     "twilio": "^3.83.0"

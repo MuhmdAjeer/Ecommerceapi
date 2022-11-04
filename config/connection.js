@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 
 const connection = () => {
@@ -7,4 +8,7 @@ const connection = () => {
         .catch(err => console.log(err, 'DB error'))
 }
 
-module.exports = connection;
+module.exports = {
+    connection,
+    AutoIncrement
+};
