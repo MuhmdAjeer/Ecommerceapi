@@ -1,12 +1,14 @@
 const Admin = require('../Model/admin')
 const bcrypt = require('bcryptjs');
+const fs = require('fs')
 
 const { generateJWT } = require('../utils/jwt');
 const Category = require('../Model/category');
 const SubCategory = require('../Model/subCategory');
 
 const { cloudinary } = require('../utils/clodinary');
-const { isValidURL } = require('../utils/utils')
+const { isValidURL } = require('../utils/utils');
+const path = require('path');
 
 module.exports = {
     login: async (req, res) => {
@@ -30,10 +32,10 @@ module.exports = {
 
     // {category : name , icon : url/image} ======> request body
     addCategory: async (req, res) => {
-        let { category, icon } = req.body;
-
+        let { category } = req.body;
+        let {icon} = req.files || req.body;
+        icon = icon.tempFilePath;
         category = category.toUpperCase()
-        console.log(req.body);
         try {
             const exist = await Category.findOne({ category });
             if (exist) return res.status(403).json({ message: "Category already exists" });
@@ -49,6 +51,10 @@ module.exports = {
             }
 
             const categoryDetails = await Category.create({ category, icon: iconUrl });
+            // console.log(__filename+'../tmp');
+            const pathd = path.join(__dirname,'../tmp')
+            console.log({pathd});
+            fs.rmSync(pathd,{recursive: true, force: true})
             return res.status(201).json({
                 message: "category added",
                 category: {

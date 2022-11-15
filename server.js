@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan')
 const dotenv = require('dotenv').config()
 const cors = require('cors')
+const fileUpload = require('express-fileupload')
 
 
 const { errorHandler } = require('./middlewares/errorMiddleware')
@@ -17,7 +18,9 @@ connectDB()
 
 app.use(morgan('dev'))
 app.use(cors())
+app.use(fileUpload({useTempFiles: true}))
 app.use(express.json())
+
 app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/v1', userRouter);
