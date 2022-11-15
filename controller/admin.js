@@ -9,6 +9,7 @@ const SubCategory = require('../Model/subCategory');
 const { cloudinary } = require('../utils/clodinary');
 const { isValidURL } = require('../utils/utils');
 const path = require('path');
+const category = require('../Model/category');
 
 module.exports = {
     login: async (req, res) => {
@@ -75,10 +76,17 @@ module.exports = {
     // {category : name , icon : url/image} ===> request body
     getAllCategories: async (req, res) => {
         try {
-            const categories = await Category.find();
+            const categories = await Category.find().populate('subCategories');
+            if(!categories.length){
+                return res.status(404).json({
+                    message : 'no categories found'
+                })
+            }
             res.status(200).json(categories);
         } catch (error) {
-            res.status(500).json({ message: "cant get categories" });
+            res.status(500).json({ 
+                message: "cant get categories" , error : error.message
+            });
         }
     },
 
@@ -113,21 +121,24 @@ module.exports = {
 
     // <<<<<<<<<<<<<<<SUBCATEOGIRES>>>>>>>>>>>>>>>>>>>>>>
     addSubCategory: async (req, res) => {
-        let { subCategory } = req.body;
+        let { name } = req.body;
 
-        subCategory = subCategory.toUpperCase()
+        name = name.toUpperCase()
         console.log(req.body);
         try {
-            const exist = await SubCategory.findOne({ subCategory });
+            const exist = await SubCategory.findOne({ name });
             if (exist) return res.status(403).json({ message: "sub-category already exists" });
-
-            const subCategoryDetails = await SubCategory.create({ subCategory});
+            
+            const subCategory = await SubCategory.create({ name });
+            await category.updateOne({_id : req.body.category},{
+                $push : { subCategories : subCategory.id }
+            })
             return res.status(201).json({
                 message: "sub-category added",
                 subCategory: {
-                    id: subCategoryDetails.id,
-                    name: subCategoryDetails.category,
-                    iconUrl: subCategoryDetails.icon
+                    id: subCategory.id,
+                    name : subCategory.name,
+                    category : req.body.category,
                 }
             })
         } catch (error) {

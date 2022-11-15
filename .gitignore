@@ -3,3 +3,5 @@ node_modules/
 
 # .env files
 .env
+
+tree.js

@@ -2,6 +2,8 @@ const { default: mongoose } = require('mongoose')
 const {AutoIncrement} = require('../config/connection')
 
 const schema = require('mongoose').Schema
+const {ObjectId} = mongoose.Schema.Types
+
 
 const categoryModal = new schema({
 
@@ -9,6 +11,12 @@ const categoryModal = new schema({
         type: String,
         required: true
     },
+    subCategories : [
+        {
+            type : ObjectId,
+            ref : "SubCategory"
+        }
+    ],
     icon: {
         type: String,
         required: true
