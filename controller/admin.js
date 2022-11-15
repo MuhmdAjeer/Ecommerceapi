@@ -53,9 +53,9 @@ module.exports = {
 
             const categoryDetails = await Category.create({ category, icon: iconUrl });
             // console.log(__filename+'../tmp');
-            const pathd = path.join(__dirname,'../tmp')
-            console.log({pathd});
-            fs.rmSync(pathd,{recursive: true, force: true})
+            const path = path.join(__dirname,'../tmp')
+            console.log({path});
+            fs.rmSync(path,{recursive: true, force: true})
             return res.status(201).json({
                 message: "category added",
                 category: {
