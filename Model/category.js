@@ -13,8 +13,11 @@ const categoryModal = new schema({
     },
     subCategories : [
         {
-            type : ObjectId,
-            ref : "SubCategory"
+
+            name : {
+                type : String
+            }
+
         }
     ],
     icon: {

@@ -11,7 +11,7 @@ router.route('/categories')
     .post(addCategory) // upload a category
     .get(getAllCategories) // to get all categories
 
-router.route('/category/:id')
+router.route('/categories/:id')
     .get(getOneCategory) // get one category by id
     .delete(deleteCategory) // delte one category by id
 
