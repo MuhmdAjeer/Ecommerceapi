@@ -9,6 +9,8 @@ const SubCategory = require('../Model/subCategory');
 const { cloudinary } = require('../utils/clodinary');
 const { isValidURL } = require('../utils/utils');
 const path = require('path');
+const subCategory = require('../Model/subCategory');
+const { isValidObjectId } = require('mongoose');
 
 module.exports = {
     login: async (req, res) => {
@@ -52,9 +54,9 @@ module.exports = {
 
             const categoryDetails = await Category.create({ category, icon: iconUrl });
             // console.log(__filename+'../tmp');
-            const pathd = path.join(__dirname,'../tmp')
-            console.log({pathd});
-            fs.rmSync(pathd,{recursive: true, force: true})
+            const path = path.join(__dirname,'../tmp')
+            console.log({path});
+            fs.rmSync(path,{recursive: true, force: true})
             return res.status(201).json({
                 message: "category added",
                 category: {
@@ -76,9 +78,16 @@ module.exports = {
     getAllCategories: async (req, res) => {
         try {
             const categories = await Category.find();
+            if(!categories.length){
+                return res.status(404).json({
+                    message : 'no categories found'
+                })
+            }
             res.status(200).json(categories);
         } catch (error) {
-            res.status(500).json({ message: "cant get categories" });
+            res.status(500).json({ 
+                message: "cant get categories" , error : error.message
+            });
         }
     },
 
@@ -99,13 +108,19 @@ module.exports = {
     // id : number =======> request params 
     getOneCategory: async (req, res) => {
         const { id } = req.params;
+        console.log(id);
         try {
-            const category = await Category.findOne({ id })
-            if (!category) return res.status(404).json({ message: "requested category not found" })
 
-            delete category._id
+            let category;
+            if(isValidObjectId(id)) category = await Category.findOne({ _id : id })
+            else category = await Category.findOne({ id : id })
+            
+
+            if (!category) return res.status(404).json({ message: "requested category not found" })
+            
             res.status(200).json(category);
         } catch (error) {
+            console.log(error);
             res.status(500).json(error)
         }
     },
@@ -113,28 +128,48 @@ module.exports = {
 
     // <<<<<<<<<<<<<<<SUBCATEOGIRES>>>>>>>>>>>>>>>>>>>>>>
     addSubCategory: async (req, res) => {
-        let { subCategory } = req.body;
+        let { name , category : categoryId } = req.body;
 
-        subCategory = subCategory.toUpperCase()
-        console.log(req.body);
         try {
-            const exist = await SubCategory.findOne({ subCategory });
-            if (exist) return res.status(403).json({ message: "sub-category already exists" });
 
-            const subCategoryDetails = await SubCategory.create({ subCategory});
+            const category = await Category.findOne({_id : categoryId })
+
+            if(!category){
+                return res.status(404).json({
+                    status : "failed",
+                    message : "Category doesnt exist"
+
+                })
+            }
+
+            const alreadyExist = await Category.findOne({_id : req.body.category,'subCategories.name' : name})
+
+            if (alreadyExist) return res.status(403).json({ message: "sub-category already exists" });
+            
+            const {subCategories} = await Category.findOneAndUpdate({_id : req.body.category},{
+                $push : {
+                    subCategories : {
+                        name
+                    }
+                }
+            },{new : true})
+
+            const subCategory = subCategories[subCategories.length-1]
+
             return res.status(201).json({
                 message: "sub-category added",
                 subCategory: {
-                    id: subCategoryDetails.id,
-                    name: subCategoryDetails.category,
-                    iconUrl: subCategoryDetails.icon
+                    id: subCategory._id,
+                    name : subCategory.name,
+                    category : req.body.category,
                 }
             })
+
         } catch (error) {
             console.log(error)
             return res.status(500).json({
                 message: "failed to add category",
-                error: error
+                error: error.message
             })
         }
     }

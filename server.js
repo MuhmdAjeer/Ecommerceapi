@@ -8,6 +8,7 @@ const fileUpload = require('express-fileupload')
 const { errorHandler } = require('./middlewares/errorMiddleware')
 const userRouter = require('./Routes/users')
 const adminRouter = require('./Routes/admin')
+const productRouter = require('./Routes/products')
 
 const {connection : connectDB} = require('./config/connection')
 
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/v1', userRouter);
 app.use('/api/v1/admin',adminRouter);
+app.use('/api/v1/products',productRouter)
 
 
 app.use(errorHandler)
