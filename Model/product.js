@@ -15,7 +15,7 @@ const productModel = new schema({
         id: {
             type: ObjectId,
             required: true,
-            ref: 'category',
+            ref: 'Category',
             subCategory: {
                 type: ObjectId,
                 ref: "subCategory"
