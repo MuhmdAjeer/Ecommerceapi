@@ -12,7 +12,6 @@ const path = require('path');
 const subCategory = require('../Model/subCategory');
 const { isValidObjectId } = require('mongoose');
 
-
 module.exports = {
     login: async (req, res) => {
         const { email, password } = req.body
@@ -78,9 +77,7 @@ module.exports = {
     // {category : name , icon : url/image} ===> request body
     getAllCategories: async (req, res) => {
         try {
-
             const categories = await Category.find();
-
             if(!categories.length){
                 return res.status(404).json({
                     message : 'no categories found'
@@ -131,7 +128,6 @@ module.exports = {
 
     // <<<<<<<<<<<<<<<SUBCATEOGIRES>>>>>>>>>>>>>>>>>>>>>>
     addSubCategory: async (req, res) => {
-
         let { name , category : categoryId } = req.body;
 
         try {
@@ -164,7 +160,6 @@ module.exports = {
                 message: "sub-category added",
                 subCategory: {
                     id: subCategory._id,
-
                     name : subCategory.name,
                     category : req.body.category,
                 }
