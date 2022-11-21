@@ -147,7 +147,7 @@ exports.addTocart = async(req,res)=>{
         }
     
         return res.status(201).json({
-            status : "success",
+            success : true,
             message : "Added to cart"
         })
     } catch (error) {
@@ -165,7 +165,29 @@ exports.getCart = async(req,res)=>{
         if(!isValidObjectId(userId)) 
         return res.status(400).json({message : "Invalid Request" })
 
-        const cartItems = await cart.findOne({user : userId}).populate('products.product');
+        const cartItems = await cart.findOne({user : userId}).populate('products.product',{
+            price:1,
+            name :1,
+            inventory : 1,
+            description : 1,
+            ratings : 1,
+            colors : 1,
+            offer: 1
+        }).exec()
+
+        console.log(cartItems);
+
+        // const cartObj = {
+        //     _id : cartItems._id,
+        //     user : cartItems.user,
+        //     products : 
+        // }
+        // cartItems.products.forEach( product  => {
+        //     product.product.size = product.size   
+        //     product.product.color = product.color
+        //     delete product.color
+        //     delete product.size
+        // });
 
         console.log(cartItems);
 
