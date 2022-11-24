@@ -5,6 +5,8 @@ const cart = require("../Model/cart");
 const product = require("../Model/product");
 const User = require("../Model/user")
 
+const ObjectId = require('mongoose').Types.ObjectId
+
 exports.addProduct = async (req, res) => {
     // take images from request ?
     // set product details in a variable ?
@@ -54,7 +56,7 @@ exports.getAllProducts = async(req,res) => {
 }
 
 exports.getProduct = async(req,res)=>{
-    const {id} = req.params;
+    const id = req.user.id;
 
     if(!isValidObjectId(id)){
         return res.status(400).json({
@@ -250,8 +252,9 @@ exports.addToWishlist = async (req,res)=>{
 exports.getWishlist = async (req,res) => {
     try {
         const userId = req.user.id;
+        console.log(userId);
         const [user] = await User.aggregate([
-            {$match : { username : 'Shamnad' }},
+            {$match : { _id : ObjectId(userId) }},
             {
                 $lookup : {
                     localField : 'wishlist',
@@ -262,7 +265,7 @@ exports.getWishlist = async (req,res) => {
             }
         ])
 
-        console.log(user.products);
+        
 
         if(!user.products.length){
             return res.status(404).json({
