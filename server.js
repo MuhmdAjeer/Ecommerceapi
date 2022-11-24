@@ -10,7 +10,8 @@ const userRouter = require('./Routes/users')
 const adminRouter = require('./Routes/admin')
 const productRouter = require('./Routes/products')
 
-const {connection : connectDB} = require('./config/connection')
+const {connection : connectDB} = require('./config/connection');
+const { verify } = require('./middlewares/authMiddleware');
 
 const PORT = process.env.PORT || 5000
 const app = express()
@@ -26,7 +27,7 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/v1', userRouter);
 app.use('/api/v1/admin',adminRouter);
-app.use('/api/v1/products',productRouter)
+app.use('/api/v1/products', verify, productRouter)
 
 
 app.use(errorHandler)

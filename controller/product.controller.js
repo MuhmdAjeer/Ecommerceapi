@@ -56,7 +56,9 @@ exports.getAllProducts = async(req,res) => {
 }
 
 exports.getProduct = async(req,res)=>{
+  try {
     const id = req.user.id;
+    const productId = req.params.id
 
     if(!isValidObjectId(id)){
         return res.status(400).json({
@@ -64,7 +66,7 @@ exports.getProduct = async(req,res)=>{
         })
     }
 
-    const product = await productModel.findById(id).populate('category.id');
+    const product = await productModel.findById(productId).populate('category.id');
 
     if(!product){
         return res.status(404).json({
@@ -73,6 +75,9 @@ exports.getProduct = async(req,res)=>{
     }
 
     return res.status(200).json(product);
+  } catch (error) {
+    return res.status(500).json({message:error.message})
+}
 }
 
 exports.addTocart = async(req,res)=>{
