@@ -9,9 +9,6 @@ router.route('/')
 router.route('/:id')
     .get(getProduct)
 
-router.route('/cart/:userId')
-    .post(addTocart)
-    .get(getCart)
 
     
 

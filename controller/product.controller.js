@@ -3,6 +3,7 @@ const productModel = require('../Model/product');
 const { isValidObjectId } = require("mongoose");
 const cart = require("../Model/cart");
 const product = require("../Model/product");
+const User = require("../Model/user")
 
 exports.addProduct = async (req, res) => {
     // take images from request ?
@@ -76,13 +77,13 @@ exports.addTocart = async(req,res)=>{
     
     
     try {
-        const {userId} = req.params;
+        const {userId} = req.user.id;
         const {quantity} = req.body;
         const productDetails = req.body;
 
         const prodouct = await product.findById(productDetails.productId);
 
-        console.log(product);
+        console.log(prodouct);
 
         if(!product){
             return res.status(404).json({
@@ -160,7 +161,8 @@ exports.addTocart = async(req,res)=>{
 }
 
 exports.getCart = async(req,res)=>{
-    const {userId} = req.params;
+    const userId = req.user.id;
+    console.log(userId);
     try {
         if(!isValidObjectId(userId)) 
         return res.status(400).json({message : "Invalid Request" })
@@ -208,5 +210,98 @@ exports.getCart = async(req,res)=>{
 
     } catch (error) {
         
+    }
+}
+
+exports.addToWishlist = async (req,res)=>{
+ try {
+    const {productId} = req.body
+    const userId = req.user.id
+    if (!productId || !userId) {
+        return res.status(404).json({message:"Provide Credentials"})
+    }
+
+    const productExist = await User.findOne({ _id : userId , wishlist :  productId })
+    console.log(productExist);
+
+    if(productExist){
+        return res.status(403).json({
+            success : false,
+            message : "Product already exists in wishlist"
+        })
+    }
+
+    await User.updateOne({_id : userId},{
+        $push : {
+            wishlist : productId
+        }
+    })
+
+    return res.status(201).json({
+        success : true,
+        message : 'Product added to wishlist'
+    })
+    
+ } catch (error) {
+    return res.status(500).json({message:error.message})
+ }
+}
+
+exports.getWishlist = async (req,res) => {
+    try {
+        const userId = req.user.id;
+        const [user] = await User.aggregate([
+            {$match : { username : 'Shamnad' }},
+            {
+                $lookup : {
+                    localField : 'wishlist',
+                    foreignField : '_id',
+                    from : 'products',
+                    as : 'products'
+                }
+            }
+        ])
+
+        console.log(user.products);
+
+        if(!user.products.length){
+            return res.status(404).json({
+                success : false,
+                message : "Wishlist is empty!"
+            })
+        }
+
+
+
+        return res.status(200).json(user.products)
+
+    } catch (error) {
+        res.status(500).json({
+            message : error.message
+        })
+    }
+}
+
+exports.removeFromWishlist = async(req,res) => {
+    try {
+        const userId = req.user.id
+        const productId = req.params.id
+
+        const result  = await User.updateOne({_id : userId},{
+            $pull : {
+                wishlist : productId
+            }
+        })
+
+        console.log(result);
+
+        return res.status(200).json({
+            success : true
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message : error.message
+        })
     }
 }
