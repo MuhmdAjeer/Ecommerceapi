@@ -1,6 +1,7 @@
 const { default: mongoose } = require('mongoose')
 
 const schema = require('mongoose').Schema
+const { ObjectId } = mongoose.Schema.Types
 
 const userModel = new schema({
 
@@ -19,7 +20,11 @@ const userModel = new schema({
     phone: {
         type: Number,
         required: true
-    }
+    },
+    wishlist : {
+            type : ObjectId,
+            ref : 'products'
+        }
 })
 
 module.exports = mongoose.model('User', userModel);
