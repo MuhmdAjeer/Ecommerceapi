@@ -24,7 +24,15 @@ const userModel = new schema({
     wishlist : {
             type : ObjectId,
             ref : 'products'
-        }
+    },
+    addresses : [{
+        address : {type : String,required : true},
+        city : {type : String,required : true},
+        pincode : {type : Number,required: true},
+        phone : {type : Number, required:true},
+        name : {type :String,required:true}
+    }]
+    
 })
 
 module.exports = mongoose.model('User', userModel);

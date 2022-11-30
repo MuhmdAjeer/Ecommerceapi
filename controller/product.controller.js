@@ -31,121 +31,121 @@ exports.addProduct = async (req, res) => {
     }
 }
 
-exports.getAllProducts = async(req,res) => {
+exports.getAllProducts = async (req, res) => {
     try {
 
-        const productsPromise =  productModel.find().populate('category.id')
+        const productsPromise = productModel.find().populate('category.id')
         const countPromise = productModel.count()
 
-        const [products,count] = await Promise.all([productsPromise,countPromise])
+        const [products, count] = await Promise.all([productsPromise, countPromise])
 
-        if(!count){
+        if (!count) {
             return res.status(404).json({
-                message : 'No products found'
+                message: 'No products found'
             })
         }
-        return res.status(200).json({products,count})
-        
+        return res.status(200).json({ products, count })
+
     } catch (error) {
 
         console.log(error);
         res.status(500).json({
-            message : error.message
+            message: error.message
         })
     }
 }
 
-exports.getProduct = async(req,res)=>{
-  try {
-    const id = req.user.id;
-    const productId = req.params.id
-
-    if(!isValidObjectId(id)){
-        return res.status(400).json({
-            message : "Invalid request"
-        })
-    }
-
-    const product = await productModel.findById(productId).populate('category.id');
-
-    if(!product){
-        return res.status(404).json({
-            message : "No product found"
-        })
-    }
-
-    return res.status(200).json(product);
-  } catch (error) {
-    return res.status(500).json({message:error.message})
-}
-}
-
-exports.addTocart = async(req,res)=>{
-    
-    
+exports.getProduct = async (req, res) => {
     try {
-        const {userId} = req.user.id;
-        const {quantity} = req.body;
+        const id = req.user.id;
+        const productId = req.params.id
+
+        if (!isValidObjectId(id)) {
+            return res.status(400).json({
+                message: "Invalid request"
+            })
+        }
+
+        const product = await productModel.findById(productId).populate('category.id');
+
+        if (!product) {
+            return res.status(404).json({
+                message: "No product found"
+            })
+        }
+
+        return res.status(200).json(product);
+    } catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+exports.addTocart = async (req, res) => {
+
+
+    try {
+        const userId = req.user.id;
+        const { quantity } = req.body;
         const productDetails = req.body;
 
         const prodouct = await product.findById(productDetails.productId);
 
         console.log(prodouct);
 
-        if(!product){
+        if (!product) {
             return res.status(404).json({
-                message : "No products found"
+                message: "No products found"
             })
         }
 
-        if(!prodouct.size.includes(productDetails.size)){
+        if (!prodouct.size.includes(productDetails.size)) {
             return res.status(400).json({
-                message : "Invalid size"
+                message: "Invalid size"
             })
         }
 
-        if(!prodouct.colors.some((c)=> c.color == productDetails.color)){
+        if (!prodouct.colors.some((c) => c.color == productDetails.color)) {
             return res.status(400).json({
-                message : "Invalid color"
+                message: "Invalid color"
             })
         }
 
 
-        
-        const cartExists = await cart.findOne({user : userId})
-    
-        if(cartExists){
+
+        const cartExists = await cart.findOne({ user: userId })
+
+        if (cartExists) {
             const productExist = await cart.findOne({
-                user : userId,
-                'products.product' : productDetails.productId,
-                'products.size' : productDetails.size,
-                'products.color' : productDetails.color
+                user: userId,
+                'products.product': productDetails.productId,
+                'products.size': productDetails.size,
+                'products.color': productDetails.color
             })
-    
-            if(productExist){
 
-                const m = await cart.findOneAndUpdate({user : userId,products : {$elemMatch: { prodouct : productDetails.productId }}},{
-                    $inc : {
-                        'products.$.quantity' : 1
+            if (productExist) {
+
+                const m = await cart.findOneAndUpdate({ user: userId, products: { $elemMatch: { prodouct: productDetails.productId } } }, {
+                    $inc: {
+                        'products.$.quantity': 1
                     }
                 })
 
-            }else{
-    
-                await cart.updateOne({user : userId},{
-                    $push : {
-                        products : {product : productDetails.productId ,quantity : quantity , ...productDetails }
+            } else {
+
+                await cart.updateOne({ user: userId }, {
+                    $push: {
+                        products: { product: productDetails.productId, quantity: quantity, ...productDetails }
                     }
                 })
             }
-    
-            }else{
+
+        } else {
             const cartItem = {
-                user : userId,
-                products : [
+                user: userId,
+                products: [
                     {
-                        product : productDetails.productId,
-                        quantity ,
+                        product: productDetails.productId,
+                        quantity,
                         ...productDetails
                     }
                 ]
@@ -153,34 +153,34 @@ exports.addTocart = async(req,res)=>{
 
             const userCart = await cart.create(cartItem)
         }
-    
+
         return res.status(201).json({
-            success : true,
-            message : "Added to cart"
+            success: true,
+            message: "Added to cart"
         })
     } catch (error) {
         console.log(error);
         return res.status(500).json({
-            message : "failed",
-            error : error.message
+            message: "failed",
+            error: error.message
         })
     }
 }
 
-exports.getCart = async(req,res)=>{
+exports.getCart = async (req, res) => {
     const userId = req.user.id;
     console.log(userId);
     try {
-        if(!isValidObjectId(userId)) 
-        return res.status(400).json({message : "Invalid Request" })
+        if (!isValidObjectId(userId))
+            return res.status(400).json({ message: "Invalid Request" })
 
-        const cartItems = await cart.findOne({user : userId}).populate('products.product',{
-            price:1,
-            name :1,
-            inventory : 1,
-            description : 1,
-            ratings : 1,
-            colors : 1,
+        const cartItems = await cart.findOne({ user: userId }).populate('products.product', {
+            price: 1,
+            name: 1,
+            inventory: 1,
+            description: 1,
+            ratings: 1,
+            colors: 1,
             offer: 1
         }).exec()
 
@@ -200,15 +200,15 @@ exports.getCart = async(req,res)=>{
 
         console.log(cartItems);
 
-        if(!cartItems){
+        if (!cartItems) {
             return res.status(404).json({
-                message : "No cart found!"
+                message: "No cart found!"
             })
         }
 
-        if(!cartItems?.products?.length){
+        if (!cartItems.products.length) {
             return res.status(404).json({
-                message : "No items in the cart!"
+                message: "No items in the cart!"
             })
         }
 
@@ -216,66 +216,66 @@ exports.getCart = async(req,res)=>{
 
 
     } catch (error) {
-        
+
     }
 }
 
-exports.addToWishlist = async (req,res)=>{
- try {
-    const {productId} = req.body
-    const userId = req.user.id
-    if (!productId || !userId) {
-        return res.status(404).json({message:"Provide Credentials"})
-    }
-
-    const productExist = await User.findOne({ _id : userId , wishlist :  productId })
-    console.log(productExist);
-
-    if(productExist){
-        return res.status(403).json({
-            success : false,
-            message : "Product already exists in wishlist"
-        })
-    }
-
-    await User.updateOne({_id : userId},{
-        $push : {
-            wishlist : productId
+exports.addToWishlist = async (req, res) => {
+    try {
+        const { productId } = req.body
+        const userId = req.user.id
+        if (!productId || !userId) {
+            return res.status(404).json({ message: "Provide Credentials" })
         }
-    })
 
-    return res.status(201).json({
-        success : true,
-        message : 'Product added to wishlist'
-    })
-    
- } catch (error) {
-    return res.status(500).json({message:error.message})
- }
+        const productExist = await User.findOne({ _id: userId, wishlist: productId })
+        console.log(productExist);
+
+        if (productExist) {
+            return res.status(403).json({
+                success: false,
+                message: "Product already exists in wishlist"
+            })
+        }
+
+        await User.updateOne({ _id: userId }, {
+            $push: {
+                wishlist: productId
+            }
+        })
+
+        return res.status(201).json({
+            success: true,
+            message: 'Product added to wishlist'
+        })
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
 }
 
-exports.getWishlist = async (req,res) => {
+exports.getWishlist = async (req, res) => {
     try {
         const userId = req.user.id;
         console.log(userId);
         const [user] = await User.aggregate([
-            {$match : { _id : ObjectId(userId) }},
+            { $match: { _id: ObjectId(userId) } },
             {
-                $lookup : {
-                    localField : 'wishlist',
-                    foreignField : '_id',
-                    from : 'products',
-                    as : 'products'
+                $lookup: {
+                    localField: 'wishlist',
+                    foreignField: '_id',
+                    from: 'products',
+                    as: 'products'
                 }
             }
         ])
 
-        
 
-        if(!user.products.length){
+
+        if (!user.products.length) {
             return res.status(404).json({
-                success : false,
-                message : "Wishlist is empty!"
+                success: false,
+                message: "Wishlist is empty!"
             })
         }
 
@@ -285,31 +285,75 @@ exports.getWishlist = async (req,res) => {
 
     } catch (error) {
         res.status(500).json({
-            message : error.message
+            message: error.message
         })
     }
 }
 
-exports.removeFromWishlist = async(req,res) => {
+exports.removeFromWishlist = async (req, res) => {
     try {
         const userId = req.user.id
         const productId = req.params.id
 
-        const result  = await User.updateOne({_id : userId},{
-            $pull : {
-                wishlist : productId
+        console.log({ productId, userId });
+
+        const result = await User.updateOne({ _id: userId }, {
+            $pull: {
+                wishlist: productId
             }
         })
+
+        if (!result.modifiedCount) {
+            return res.status(409).json({
+                success: false,
+                message: "failed to remove"
+            })
+        }
 
         console.log(result);
 
         return res.status(200).json({
-            success : true
+            success: true,
+            message: 'Removed successfully'
         })
 
     } catch (error) {
         res.status(500).json({
-            message : error.message
+            message: error.message
         })
+    }
+}
+
+exports.addAddress = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const address = {
+            userId,
+            address : req.body.address,
+            city : req.body.city,
+            pincode : req.body.pincode
+        }
+
+        // if (!userId || !address || !city || !pincode) {
+        //     return res.status(400).json({ message: "Provide credentials" })
+        // }
+
+        //const addressExist = await User.findOne({ _id: userId, wishlist: productId })
+
+        // if (addressExist) {
+        //     return res.status(403).json({ message: "Address already exist" })
+        // }
+
+        await User.updateOne({ _id: userId }, {
+            $push: {
+                address: address
+            }
+        })
+
+        return res.status(201).json({message:"address added successfully"})
+
+    } catch (error) {
+        res.status(500).json({ message: error.message })
     }
 }
