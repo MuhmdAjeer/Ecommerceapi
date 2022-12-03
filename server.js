@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/v1', userRouter);
 app.use('/api/v1/admin',adminRouter);
-app.use('/api/v1/products', verify, productRouter)
+app.use('/api/v1/products', productRouter)
 
 
 app.use(errorHandler)

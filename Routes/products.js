@@ -10,6 +10,9 @@ router.route('/')
 router.route('/:id')
     .get(getProduct)
 
+    
+
+
 
     
 

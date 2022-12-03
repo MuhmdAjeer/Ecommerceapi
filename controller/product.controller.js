@@ -19,7 +19,8 @@ exports.addProduct = async (req, res) => {
     try {
         const product = await productModel.create(productDetails)
         return res.status(201).json({
-            message: 'success', productId: product.id
+            message: 'success', 
+            productId: product.id
         })
 
     } catch (error) {
@@ -33,18 +34,12 @@ exports.addProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
     try {
-
-        const productsPromise = productModel.find().populate('category.id')
-        const countPromise = productModel.count()
-
-        const [products, count] = await Promise.all([productsPromise, countPromise])
-
-        if (!count) {
-            return res.status(404).json({
-                message: 'No products found'
-            })
+        const match = {};
+        if(req.query.category){
+            match.category = req.query.category
         }
-        return res.status(200).json({ products, count })
+        const products = await productModel.find(match).populate('category')
+        return res.status(200).json(products)
 
     } catch (error) {
 

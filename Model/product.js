@@ -12,15 +12,9 @@ const productModel = new schema({
         required: true
     },
     category: {
-        id: {
             type: ObjectId,
             required: true,
             ref: 'Category',
-        },
-        subCategory: {
-                type: ObjectId,
-                ref: "Category"
-            }
         },
     price: {
         type: Number,
